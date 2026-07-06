@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Spotify-inspired dark palette */
+  --bg: #121212;
+  --bg-elevated: #181818;
+  --bg-elevated-hover: #282828;
+  --bg-black: #000000;
+  --text: #ffffff;
+  --text-muted: #b3b3b3;
+  --green: #1db954;
+  --green-hover: #1ed760;
+
+  /* Legacy variable names kept so existing component CSS keeps working,
+     remapped to the dark theme. */
+  --primary: #ffffff;      /* text / headings */
+  --secondary: #1db954;    /* links & accents */
+  --accent: #1db954;
+  --danger: #f15e6c;
+  --light: #282828;        /* elevated surfaces */
+  --border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+h1, h2, h3, h4 {
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+a:hover {
+  text-decoration: none;
+  color: var(--green-hover);
+}
+
+/* Spotify's signature green pill button */
+button {
+  padding: 0.75rem 2rem;
+  background-color: var(--green);
+  color: #000;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+  transition: transform 0.1s ease, background-color 0.2s, opacity 0.2s;
+}
+
+button:hover:not(:disabled) {
+  background-color: var(--green-hover);
+  transform: scale(1.04);
+}
+
+button:active:not(:disabled) {
+  transform: scale(1);
+}
+
+button:disabled {
+  background-color: #535353;
+  color: #b3b3b3;
+  cursor: not-allowed;
+}
+
+input, textarea, select {
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-elevated-hover);
+  color: var(--text);
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--text);
+  background-color: #3e3e3e;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.card {
+  background: var(--bg-elevated);
+  border: none;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: none;
+  transition: background-color 0.3s;
+}
+
+.card:hover {
+  background: var(--bg-elevated-hover);
+  box-shadow: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge.primary {
+  background-color: rgba(29, 185, 84, 0.15);
+  color: var(--green);
+}
+
+.badge.success {
+  background-color: rgba(29, 185, 84, 0.15);
+  color: var(--green);
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+
+.error {
+  padding: 1rem;
+  background-color: rgba(241, 94, 108, 0.15);
+  color: var(--danger);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.success {
+  padding: 1rem;
+  background-color: rgba(29, 185, 84, 0.15);
+  color: var(--green);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}

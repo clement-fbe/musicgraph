@@ -1,0 +1,75 @@
+services:
+  neo4j:
+    image: neo4j:5.12
+    container_name: musicgraph-neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/change-me
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+    ports:
+      - '7474:7474'  # HTTP
+      - '7687:7687'  # Bolt
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      # cypher-shell spins up a JVM on each call (slow), so give it generous
+      # timeouts and a longer start period to avoid false "unhealthy" states.
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p change-me 'RETURN 1' || exit 1"]
+      interval: 15s
+      timeout: 15s
+      retries: 10
+      start_period: 60s
+    networks:
+      - musicgraph
+
+  backend:
+    build: ./backend
+    container_name: musicgraph-backend
+    environment:
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=change-me
+      - MUSICBRAINZ_BASE=https://musicbrainz.org/ws/2
+      - MUSICBRAINZ_USER_AGENT=MusicGraph/1.0 (example@example.com)
+      # Spotify credentials — read from your local .env (empty = covers disabled).
+      - SPOTIFY_CLIENT_ID=${SPOTIFY_CLIENT_ID:-}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET:-}
+    ports:
+      - '8000:8000'
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    healthcheck:
+      # Use Python (always present in the image) instead of curl
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - musicgraph
+
+  frontend:
+    build: ./frontend
+    container_name: musicgraph-frontend
+    ports:
+      - '3000:3000'
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - VITE_API_BASE=http://localhost:8000/api
+    networks:
+      - musicgraph
+
+volumes:
+  neo4j_data:
+
+networks:
+  musicgraph:
+    driver: bridge
+    driver_opts:
+      # Docker Desktop / WSL2 sur Windows : le MTU par défaut (1500) est trop
+      # grand pour le chemin réseau WSL2, ce qui fait échouer le handshake TLS
+      # sortant (ex. MusicBrainz) avec "SSL: UNEXPECTED_EOF_WHILE_READING".
+      # On force 1400 pour éviter la perte de paquets.
+      com.docker.network.driver.mtu: 1400
