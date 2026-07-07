@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../../../core/api/api_client.dart';
 import '../../../core/router/app_routes.dart';
@@ -20,11 +21,14 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _controller = TextEditingController();
+  final stt.SpeechToText _speech = stt.SpeechToText();
   Timer? _debounce;
+  bool _isListening = false;
 
   @override
   void dispose() {
     _debounce?.cancel();
+    _speech.stop();
     _controller.dispose();
     super.dispose();
   }
@@ -34,6 +38,49 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     _debounce = Timer(const Duration(milliseconds: 400), () {
       ref.read(searchQueryProvider.notifier).update(value.trim());
     });
+  }
+
+  /// Recherche vocale (micro) : reconnaissance vocale native -> champ + requête.
+  Future<void> _toggleVoiceSearch() async {
+    if (_isListening) {
+      await _speech.stop();
+      setState(() => _isListening = false);
+      return;
+    }
+
+    final available = await _speech.initialize(
+      onStatus: (status) {
+        if (status == 'done' || status == 'notListening') {
+          if (mounted) setState(() => _isListening = false);
+        }
+      },
+      onError: (_) {
+        if (mounted) setState(() => _isListening = false);
+      },
+    );
+
+    if (!available) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Micro / reconnaissance vocale indisponible.')),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isListening = true);
+    await _speech.listen(
+      listenOptions: stt.SpeechListenOptions(localeId: 'fr_FR'),
+      onResult: (result) {
+        _controller.text = result.recognizedWords;
+        if (result.finalResult) {
+          ref
+              .read(searchQueryProvider.notifier)
+              .update(result.recognizedWords.trim());
+          if (mounted) setState(() => _isListening = false);
+        }
+      },
+    );
   }
 
   @override
@@ -56,9 +103,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 hintText: 'Rechercher un artiste…',
                 prefixIcon: const Icon(Icons.search),
                 border: const OutlineInputBorder(),
-                suffixIcon: _controller.text.isEmpty
-                    ? null
-                    : IconButton(
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
+                      color: _isListening ? Colors.red : null,
+                      tooltip: 'Recherche vocale',
+                      onPressed: _toggleVoiceSearch,
+                    ),
+                    if (_controller.text.isNotEmpty)
+                      IconButton(
                         icon: const Icon(Icons.clear),
                         onPressed: () {
                           _controller.clear();
@@ -66,6 +121,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           setState(() {});
                         },
                       ),
+                  ],
+                ),
               ),
             ),
           ),

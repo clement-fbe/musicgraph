@@ -275,7 +275,7 @@ def _enrich_with_spotify(mbid: str, name: Optional[str] = None) -> dict:
                 continue
             seen_tracks.add(key)
             try:
-                create_or_update_recording(t_id, t_name, length_ms=track.get("duration_ms"))
+                create_or_update_recording(t_id, t_name, length_ms=track.get("duration_ms"), preview_url=track.get("preview_url"))
                 create_recording_appears_on_album(t_id, alb_id, track_number=track.get("track_number"))
 
                 # Credit the track artists: the main artist PERFORMED, the

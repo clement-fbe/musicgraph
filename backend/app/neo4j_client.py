@@ -48,16 +48,16 @@ def mark_artist_imported(mbid: str):
         return session.run(query, mbid=mbid).single()
 
 
-def create_or_update_recording(mbid: str, name: str, length_ms: Optional[int] = None) -> Dict[str, Any]:
+def create_or_update_recording(mbid: str, name: str, length_ms: Optional[int] = None, preview_url: Optional[str] = None) -> Dict[str, Any]:
     """Create or update a Recording node."""
     drv = get_driver()
     query = (
         "MERGE (r:Recording {mbid: $mbid})\n"
-        "SET r.name = $name, r.length_ms = $length_ms, r.updated_at = datetime()\n"
+        "SET r.name = $name, r.length_ms = $length_ms, r.preview_url = $preview_url, r.updated_at = datetime()\n"
         "RETURN r"
     )
     with drv.session() as session:
-        result = session.run(query, mbid=mbid, name=name, length_ms=length_ms)
+        result = session.run(query, mbid=mbid, name=name, length_ms=length_ms, preview_url=preview_url)
         record = result.single()
         return dict(record["r"]) if record else None
 

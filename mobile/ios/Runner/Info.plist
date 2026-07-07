@@ -28,6 +28,16 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>MusicGraph utilise la camera pour scanner des QR codes Spotify.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>MusicGraph utilise le micro pour la recherche vocale d'artistes.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>MusicGraph utilise la reconnaissance vocale pour rechercher un artiste.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>MusicGraph utilise Face ID pour proteger l'acces aux favoris.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>spotify</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

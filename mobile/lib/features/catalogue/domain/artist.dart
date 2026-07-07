@@ -12,6 +12,7 @@ class Artist {
   final String? disambiguation;
   final String? beginDate;
   final List<String> genres;
+  final String? spotifyUrl;
 
   const Artist({
     required this.mbid,
@@ -22,6 +23,7 @@ class Artist {
     this.disambiguation,
     this.beginDate,
     this.genres = const [],
+    this.spotifyUrl,
   });
 
   factory Artist.fromJson(Map<String, dynamic> json) {
@@ -37,6 +39,7 @@ class Artist {
               ?.map((e) => e.toString())
               .toList(growable: false) ??
           const [],
+      spotifyUrl: json['spotify_url'] as String?,
     );
   }
 
@@ -49,6 +52,7 @@ class Artist {
         'disambiguation': disambiguation,
         'beginDate': beginDate,
         'genres': genres,
+        'spotify_url': spotifyUrl,
       };
 
   /// Description lisible pour le catalogue / le détail (critère « Description »).

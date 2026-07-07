@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/external_actions.dart';
 import '../data/tracks_repository.dart';
 import '../domain/artist_detail.dart';
 import 'track_tile.dart';
@@ -17,7 +18,26 @@ class AlbumTracksScreen extends ConsumerWidget {
     final albumId = album.spotifyId;
 
     return Scaffold(
-      appBar: AppBar(title: Text(album.name)),
+      appBar: AppBar(
+        title: Text(album.name),
+        actions: [
+          if (album.spotifyUrl != null && album.spotifyUrl!.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.open_in_new),
+              tooltip: 'Ouvrir dans Spotify',
+              onPressed: () => openExternal(context, album.spotifyUrl),
+            ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: 'Partager',
+            onPressed: () => shareText(
+              album.spotifyUrl == null
+                  ? 'Album ${album.name} sur MusicGraph'
+                  : 'Album ${album.name} : ${album.spotifyUrl}',
+            ),
+          ),
+        ],
+      ),
       body: albumId == null
           ? const Center(child: Text('Album non disponible.'))
           : ref.watch(albumTracksProvider(albumId)).when(

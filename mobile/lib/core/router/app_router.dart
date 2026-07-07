@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/catalogue/presentation/catalogue_screen.dart';
 import '../../features/detail/presentation/artist_detail_screen.dart';
-import '../../features/favorites/presentation/favorites_screen.dart';
+import '../../features/favorites/presentation/favorites_gate.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/scan/presentation/scan_screen.dart';
 import '../../features/search/presentation/search_screen.dart';
@@ -39,7 +39,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         name: AppRoutes.favoritesName,
         path: AppRoutes.favoritesPath,
-        builder: (context, state) => const FavoritesScreen(),
+        builder: (context, state) => const FavoritesGate(),
       ),
       GoRoute(
         name: AppRoutes.searchName,
