@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/api/api_client.dart';
+import '../../../core/router/app_routes.dart';
 import '../../catalogue/domain/artist.dart';
+import '../../catalogue/presentation/catalogue_providers.dart';
 import 'search_view_model.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
@@ -106,6 +109,11 @@ class _ResultTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final importing = ref.watch(importControllerProvider).contains(artist.mbid);
+    // L'artiste est-il déjà dans le catalogue (importé) ?
+    final imported = ref.watch(catalogueProvider).value?.any(
+              (a) => a.mbid == artist.mbid,
+            ) ??
+        false;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -123,18 +131,46 @@ class _ResultTile extends ConsumerWidget {
         title: Text(artist.name, maxLines: 1, overflow: TextOverflow.ellipsis),
         subtitle: Text(artist.description,
             maxLines: 2, overflow: TextOverflow.ellipsis),
-        trailing: importing
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            : IconButton(
-                icon: const Icon(Icons.download),
-                tooltip: 'Importer',
-                onPressed: () => _import(context, ref),
-              ),
+        trailing: _buildTrailing(context, ref, importing: importing, imported: imported),
+        // Une fois importé, on ouvre sa fiche artiste au tap sur la ligne.
+        onTap: imported
+            ? () => context.pushNamed(
+                  AppRoutes.artistDetailName,
+                  pathParameters: {'mbid': artist.mbid},
+                )
+            : null,
       ),
+    );
+  }
+
+  Widget _buildTrailing(
+    BuildContext context,
+    WidgetRef ref, {
+    required bool importing,
+    required bool imported,
+  }) {
+    if (importing) {
+      return const SizedBox(
+        width: 24,
+        height: 24,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      );
+    }
+    if (imported) {
+      // Déjà importé : on retire l'icône de téléchargement, on indique
+      // que la fiche est accessible.
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.check_circle, color: Colors.green.shade600),
+          const Icon(Icons.chevron_right),
+        ],
+      );
+    }
+    return IconButton(
+      icon: const Icon(Icons.download),
+      tooltip: 'Importer',
+      onPressed: () => _import(context, ref),
     );
   }
 
