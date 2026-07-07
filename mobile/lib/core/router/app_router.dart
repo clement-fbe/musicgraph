@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/catalogue/presentation/catalogue_screen.dart';
 import '../../features/detail/presentation/artist_detail_screen.dart';
+import '../../features/favorites/presentation/favorites_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/scan/presentation/scan_screen.dart';
 import 'app_routes.dart';
@@ -33,6 +34,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: AppRoutes.scanName,
         path: AppRoutes.scanPath,
         builder: (context, state) => const ScanScreen(),
+      ),
+      GoRoute(
+        name: AppRoutes.favoritesName,
+        path: AppRoutes.favoritesPath,
+        builder: (context, state) => const FavoritesScreen(),
       ),
     ],
   );

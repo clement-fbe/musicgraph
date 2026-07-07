@@ -53,6 +53,14 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
 
+# Configuration de l'icône d'application (dart run flutter_launcher_icons).
+flutter_launcher_icons:
+  image_path: "assets/icon/musicgraph.png"
+  android: "launcher_icon"
+  min_sdk_android: 21
+  ios: true
+  remove_alpha_ios: true
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

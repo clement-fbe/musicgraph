@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/api/api_client.dart';
 import '../../../core/router/app_routes.dart';
+import '../../favorites/presentation/favorites_providers.dart';
 import '../domain/artist.dart';
 import 'catalogue_providers.dart';
 
@@ -77,7 +78,13 @@ class _ArtistList extends StatelessWidget {
             title: Text(a.name, maxLines: 1, overflow: TextOverflow.ellipsis),
             subtitle:
                 Text(a.description, maxLines: 2, overflow: TextOverflow.ellipsis),
-            trailing: a.year != null ? Text(a.year!) : null,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (a.year != null) Text(a.year!),
+                _FavoriteButton(artist: a),
+              ],
+            ),
             onTap: () => _openDetail(context, a),
           ),
         );
@@ -113,7 +120,19 @@ class _ArtistGrid extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(child: _Thumb(url: a.imageUrl)),
+                Expanded(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      _Thumb(url: a.imageUrl),
+                      Positioned(
+                        top: 4,
+                        right: 4,
+                        child: _FavoriteButton(artist: a, filledBackground: true),
+                      ),
+                    ],
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: Column(
@@ -140,6 +159,33 @@ class _ArtistGrid extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Bouton favori (cœur) — lit/écrit l'état via Riverpod (feature favorites).
+class _FavoriteButton extends ConsumerWidget {
+  const _FavoriteButton({required this.artist, this.filledBackground = false});
+
+  final Artist artist;
+  final bool filledBackground;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isFav = ref.watch(isFavoriteProvider(artist.mbid));
+    final button = IconButton(
+      icon: Icon(
+        isFav ? Icons.favorite : Icons.favorite_border,
+        color: isFav ? Colors.red : null,
+      ),
+      tooltip: isFav ? 'Retirer des favoris' : 'Ajouter aux favoris',
+      onPressed: () => ref.read(favoritesProvider.notifier).toggle(artist),
+    );
+    if (!filledBackground) return button;
+    // Sur une image (grille) : fond semi-opaque pour la lisibilité.
+    return CircleAvatar(
+      backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
+      child: button,
     );
   }
 }
