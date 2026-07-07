@@ -43,3 +43,6 @@ mobile/.dart_tool/
 mobile/.flutter-plugins
 mobile/.flutter-plugins-dependencies
 **/*.iml
+
+# Docs (non publiés sur le repo)
+docs/
