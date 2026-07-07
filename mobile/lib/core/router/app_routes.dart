@@ -6,12 +6,14 @@ class AppRoutes {
   static const artistDetailName = 'artist-detail';
   static const scanName = 'scan';
   static const favoritesName = 'favorites';
+  static const searchName = 'search';
 
   static const homePath = '/';
   static const cataloguePath = '/catalogue';
   static const artistDetailPath = '/artist/:mbid';
   static const scanPath = '/scan';
   static const favoritesPath = '/favorites';
+  static const searchPath = '/search';
 
   static String artistDetailLocation(String mbid) => '/artist/$mbid';
 }

@@ -6,6 +6,7 @@ import '../../features/detail/presentation/artist_detail_screen.dart';
 import '../../features/favorites/presentation/favorites_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/scan/presentation/scan_screen.dart';
+import '../../features/search/presentation/search_screen.dart';
 import 'app_routes.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -39,6 +40,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: AppRoutes.favoritesName,
         path: AppRoutes.favoritesPath,
         builder: (context, state) => const FavoritesScreen(),
+      ),
+      GoRoute(
+        name: AppRoutes.searchName,
+        path: AppRoutes.searchPath,
+        builder: (context, state) => const SearchScreen(),
       ),
     ],
   );
