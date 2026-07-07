@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE = 'http://localhost:8000/api'
+const API_BASE = 'https://musicgraph.alwaysdata.net/api'
 
 // Default client for quick requests
 const api = axios.create({

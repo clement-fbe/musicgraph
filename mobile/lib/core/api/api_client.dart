@@ -31,7 +31,7 @@ class ApiClient {
   /// - Simulateur iOS / desktop  : `http://localhost:8000/api`
   /// - TÉLÉPHONE RÉEL (USB/Wi-Fi): `http://<IP_LAN_DU_PC>:8000/api`
   ///   (ex: `http://192.168.1.20:8000/api` — le tel doit être sur le même réseau)
-  static const String defaultBaseUrl = 'http://10.31.32.32:8000/api';
+  static const String defaultBaseUrl = 'https://musicgraph.alwaysdata.net/api';
 
   final String baseUrl;
   final http.Client _client;
