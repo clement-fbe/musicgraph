@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="musicgraph_mobile"
         android:name="${applicationName}"
@@ -42,6 +45,4 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
-
-    <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
