@@ -103,6 +103,8 @@ class _DetailContent extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(height: 28),
+                _AlbumsSection(albums: detail.albums),
+                const SizedBox(height: 28),
                 _RecordingsSection(recordings: detail.recordings),
                 const SizedBox(height: 28),
                 _CollaboratorsSection(collaborators: detail.collaborators),
@@ -259,6 +261,92 @@ class _InfoTile extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _AlbumsSection extends StatelessWidget {
+  const _AlbumsSection({required this.albums});
+
+  final List<ArtistAlbum> albums;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionTitle(title: 'Albums', count: albums.length),
+        const SizedBox(height: 12),
+        if (albums.isEmpty)
+          Text('Aucun album disponible.',
+              style: Theme.of(context).textTheme.bodyMedium)
+        else
+          SizedBox(
+            height: 210,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: albums.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              itemBuilder: (context, index) => _AlbumCard(album: albums[index]),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _AlbumCard extends StatelessWidget {
+  const _AlbumCard({required this.album});
+
+  final ArtistAlbum album;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final placeholder = ColoredBox(
+      color: colorScheme.surfaceContainerHighest,
+      child: Icon(Icons.album, size: 48, color: colorScheme.onSurfaceVariant),
+    );
+
+    return SizedBox(
+      width: 150,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: SizedBox(
+              width: 150,
+              height: 150,
+              child: (album.coverUrl == null || album.coverUrl!.isEmpty)
+                  ? placeholder
+                  : CachedNetworkImage(
+                      imageUrl: album.coverUrl!,
+                      fit: BoxFit.cover,
+                      placeholder: (_, _) =>
+                          ColoredBox(color: colorScheme.surfaceContainerHighest),
+                      errorWidget: (_, _, _) => placeholder,
+                    ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            album.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          Text(
+            [
+              if (album.year != null) album.year!,
+              if (album.totalTracks != null) '${album.totalTracks} titres',
+            ].join(' · '),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
       ),
     );
   }
