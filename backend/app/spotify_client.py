@@ -205,6 +205,7 @@ def get_album_tracks(album_spotify_id: str) -> List[Dict[str, Any]]:
                 "name": t.get("name"),
                 "duration_ms": t.get("duration_ms"),
                 "track_number": t.get("track_number"),
+                "preview_url": t.get("preview_url"),
                 "artists": [
                     {"id": ar.get("id"), "name": ar.get("name")}
                     for ar in t.get("artists", []) if ar.get("id")

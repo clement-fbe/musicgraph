@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/external_actions.dart';
+import '../../catalogue/domain/artist.dart';
 import '../../favorites/presentation/favorites_providers.dart';
 import '../domain/artist_detail.dart';
 import 'album_tracks_screen.dart';
@@ -84,6 +86,8 @@ class _DetailContent extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(artist.description, style: theme.textTheme.bodyLarge),
+                const SizedBox(height: 16),
+                _ArtistActions(artist: artist),
                 const SizedBox(height: 24),
                 _InfoGrid(
                   items: [
@@ -118,6 +122,37 @@ class _DetailContent extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ArtistActions extends StatelessWidget {
+  const _ArtistActions({required this.artist});
+
+  final Artist artist;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        if (artist.spotifyUrl != null && artist.spotifyUrl!.isNotEmpty)
+          FilledButton.tonalIcon(
+            onPressed: () => openExternal(context, artist.spotifyUrl),
+            icon: const Icon(Icons.open_in_new),
+            label: const Text('Ouvrir dans Spotify'),
+          ),
+        OutlinedButton.icon(
+          onPressed: () => shareText(
+            artist.spotifyUrl == null
+                ? 'Découvre ${artist.name} sur MusicGraph'
+                : 'Découvre ${artist.name} : ${artist.spotifyUrl}',
+          ),
+          icon: const Icon(Icons.share),
+          label: const Text('Partager'),
         ),
       ],
     );

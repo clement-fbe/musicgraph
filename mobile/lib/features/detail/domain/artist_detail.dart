@@ -41,6 +41,7 @@ class ArtistAlbum {
     this.releaseDate,
     this.albumType,
     this.totalTracks,
+    this.spotifyUrl,
   });
 
   final String name;
@@ -49,6 +50,7 @@ class ArtistAlbum {
   final String? releaseDate;
   final String? albumType;
   final int? totalTracks;
+  final String? spotifyUrl;
 
   factory ArtistAlbum.fromJson(Map<String, dynamic> json) {
     return ArtistAlbum(
@@ -58,6 +60,7 @@ class ArtistAlbum {
       releaseDate: json['release_date'] as String?,
       albumType: json['album_type'] as String?,
       totalTracks: _intOrNull(json['total_tracks']),
+      spotifyUrl: json['spotify_url'] as String?,
     );
   }
 
@@ -76,6 +79,7 @@ class ArtistRecording {
     this.position,
     this.lengthMs,
     this.coverUrl,
+    this.previewUrl,
   });
 
   final String name;
@@ -84,6 +88,7 @@ class ArtistRecording {
   final int? position;
   final int? lengthMs;
   final String? coverUrl;
+  final String? previewUrl;
 
   factory ArtistRecording.fromJson(Map<String, dynamic> json) {
     final recording = json['recording'];
@@ -100,6 +105,7 @@ class ArtistRecording {
       position: _intOrNull(json['position'] ?? json['track_number']),
       lengthMs: _intOrNull(recordingJson['length_ms']),
       coverUrl: json['cover_url'] as String?,
+      previewUrl: recordingJson['preview_url'] as String?,
     );
   }
 }
