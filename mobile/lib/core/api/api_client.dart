@@ -36,13 +36,13 @@ class ApiClient {
   final String baseUrl;
   final http.Client _client;
 
-  static const Duration _timeout = Duration(seconds: 15);
+  static const Duration _defaultTimeout = Duration(seconds: 15);
 
   /// GET `path` (ex: `/artists`). Retourne le JSON décodé (Map ou List).
-  Future<dynamic> get(String path) async {
+  Future<dynamic> get(String path, {Duration? timeout}) async {
     final uri = Uri.parse('$baseUrl$path');
     try {
-      final res = await _client.get(uri).timeout(_timeout);
+      final res = await _client.get(uri).timeout(timeout ?? _defaultTimeout);
       return _handle(res);
     } on TimeoutException {
       throw const ApiException('Délai d\'attente dépassé.');
@@ -52,7 +52,8 @@ class ApiClient {
   }
 
   /// POST `path` avec un corps JSON optionnel.
-  Future<dynamic> post(String path, {Object? body}) async {
+  /// `timeout` peut être allongé pour les opérations lentes (import/enrich).
+  Future<dynamic> post(String path, {Object? body, Duration? timeout}) async {
     final uri = Uri.parse('$baseUrl$path');
     try {
       final res = await _client
@@ -61,7 +62,7 @@ class ApiClient {
             headers: const {'Content-Type': 'application/json'},
             body: body == null ? null : jsonEncode(body),
           )
-          .timeout(_timeout);
+          .timeout(timeout ?? _defaultTimeout);
       return _handle(res);
     } on TimeoutException {
       throw const ApiException('Délai d\'attente dépassé.');

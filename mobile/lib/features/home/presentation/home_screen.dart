@@ -43,19 +43,25 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
                   FilledButton.icon(
-                    onPressed: () => context.goNamed(AppRoutes.catalogueName),
+                    onPressed: () => context.pushNamed(AppRoutes.catalogueName),
                     icon: const Icon(Icons.library_music),
                     label: const Text('Voir le catalogue'),
                   ),
                   const SizedBox(height: 12),
+                  FilledButton.tonalIcon(
+                    onPressed: () => context.pushNamed(AppRoutes.searchName),
+                    icon: const Icon(Icons.search),
+                    label: const Text('Rechercher / importer'),
+                  ),
+                  const SizedBox(height: 12),
                   OutlinedButton.icon(
-                    onPressed: () => context.goNamed(AppRoutes.scanName),
+                    onPressed: () => context.pushNamed(AppRoutes.scanName),
                     icon: const Icon(Icons.qr_code_scanner),
                     label: const Text('Scanner un QR code'),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
-                    onPressed: () => context.goNamed(AppRoutes.favoritesName),
+                    onPressed: () => context.pushNamed(AppRoutes.favoritesName),
                     icon: const Icon(Icons.favorite),
                     label: const Text('Mes favoris'),
                   ),
