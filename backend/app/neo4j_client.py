@@ -280,6 +280,60 @@ def get_artist_recordings(artist_mbid: str, limit: int = 50) -> List[Dict[str, A
         return [{"recording": dict(record["r"]), "position": record["position"], "rel_type": record["rel_type"]} for record in result]
 
 
+def get_artist_recordings_paged(artist_mbid: str, limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
+    """Fetch recordings performed/featured by an artist, paginated, with the
+    cover of one album the track appears on (when available)."""
+    drv = get_driver()
+    query = (
+        "MATCH (a:Artist {mbid: $artist_mbid})-[rel:PERFORMED|FEATURED_ON]->(r:Recording)\n"
+        "OPTIONAL MATCH (r)-[:APPEARS_ON]->(al:Album)\n"
+        "WITH r, head(collect(DISTINCT type(rel))) AS rel_type,\n"
+        "     head(collect(rel.position)) AS position,\n"
+        "     [x IN collect(DISTINCT al) WHERE x IS NOT NULL] AS albums\n"
+        "RETURN r, rel_type, position,\n"
+        "       [x IN albums WHERE x.cover_url IS NOT NULL | x.cover_url][0] AS cover_url,\n"
+        "       [x IN albums | x.name][0] AS album_name\n"
+        "ORDER BY coalesce(r.name, '')\n"
+        "SKIP $offset LIMIT $limit"
+    )
+    with drv.session() as session:
+        result = session.run(query, artist_mbid=artist_mbid, limit=limit, offset=offset)
+        return [
+            {
+                "recording": dict(record["r"]),
+                "rel_type": record["rel_type"],
+                "position": record["position"],
+                "cover_url": record["cover_url"],
+                "album_name": record["album_name"],
+            }
+            for record in result
+        ]
+
+
+def get_album_recordings(album_spotify_id: str, limit: int = 200) -> List[Dict[str, Any]]:
+    """Fetch the tracks (recordings) of an album, ordered by track number,
+    each carrying the album cover."""
+    drv = get_driver()
+    query = (
+        "MATCH (r:Recording)-[appon:APPEARS_ON]->(al:Album {spotify_id: $sid})\n"
+        "RETURN r, appon.track_number AS track_number,\n"
+        "       al.cover_url AS cover_url, al.name AS album_name\n"
+        "ORDER BY appon.track_number\n"
+        "LIMIT $limit"
+    )
+    with drv.session() as session:
+        result = session.run(query, sid=album_spotify_id, limit=limit)
+        return [
+            {
+                "recording": dict(record["r"]),
+                "track_number": record["track_number"],
+                "cover_url": record["cover_url"],
+                "album_name": record["album_name"],
+            }
+            for record in result
+        ]
+
+
 def get_artist_collaborations(artist_mbid: str, limit: int = 50) -> List[Dict[str, Any]]:
     """Fetch all collaborators of an artist."""
     drv = get_driver()

@@ -14,7 +14,8 @@ from app.neo4j_client import (
     create_appears_on_relationship,
     detect_collaborations_for_artist,
     get_artist_by_mbid,
-    get_artist_recordings,
+    get_artist_recordings_paged,
+    get_album_recordings,
     get_artist_collaborations,
     get_graph_for_artist
 )
@@ -360,7 +361,9 @@ async def get_artist_details(artist_mbid: str):
     if not artist:
         raise HTTPException(status_code=404, detail="Artist not found")
 
-    recordings = get_artist_recordings(artist_mbid)
+    # Recordings avec la cover de leur album (aperçu = 50 max ici ;
+    # la liste complète est paginée via /artists/{mbid}/recordings).
+    recordings = get_artist_recordings_paged(artist_mbid, limit=50, offset=0)
     collaborators = get_artist_collaborations(artist_mbid)
     albums = get_artist_albums(artist_mbid)
 
@@ -370,6 +373,24 @@ async def get_artist_details(artist_mbid: str):
         "collaborators": collaborators,
         "albums": albums
     }
+
+
+@app.get("/api/artists/{artist_mbid}/recordings")
+async def artist_recordings(artist_mbid: str, limit: int = 50, offset: int = 0):
+    """Liste paginée de TOUS les titres d'un artiste (avec cover d'album)."""
+    limit = max(1, min(limit, 200))
+    offset = max(0, offset)
+    return {
+        "recordings": get_artist_recordings_paged(artist_mbid, limit=limit, offset=offset),
+        "limit": limit,
+        "offset": offset,
+    }
+
+
+@app.get("/api/albums/{album_spotify_id}/tracks")
+async def album_tracks(album_spotify_id: str):
+    """Titres d'un album (via APPEARS_ON), avec la cover de l'album."""
+    return {"tracks": get_album_recordings(album_spotify_id)}
 
 
 @app.get("/api/artists/{artist_mbid}/collaborations")

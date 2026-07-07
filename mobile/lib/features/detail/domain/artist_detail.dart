@@ -36,6 +36,7 @@ class ArtistDetail {
 class ArtistAlbum {
   const ArtistAlbum({
     required this.name,
+    this.spotifyId,
     this.coverUrl,
     this.releaseDate,
     this.albumType,
@@ -43,6 +44,7 @@ class ArtistAlbum {
   });
 
   final String name;
+  final String? spotifyId;
   final String? coverUrl;
   final String? releaseDate;
   final String? albumType;
@@ -51,6 +53,7 @@ class ArtistAlbum {
   factory ArtistAlbum.fromJson(Map<String, dynamic> json) {
     return ArtistAlbum(
       name: (json['name'] ?? 'Album inconnu').toString(),
+      spotifyId: json['spotify_id']?.toString(),
       coverUrl: json['cover_url'] as String?,
       releaseDate: json['release_date'] as String?,
       albumType: json['album_type'] as String?,
@@ -72,6 +75,7 @@ class ArtistRecording {
     this.relationType,
     this.position,
     this.lengthMs,
+    this.coverUrl,
   });
 
   final String name;
@@ -79,6 +83,7 @@ class ArtistRecording {
   final String? relationType;
   final int? position;
   final int? lengthMs;
+  final String? coverUrl;
 
   factory ArtistRecording.fromJson(Map<String, dynamic> json) {
     final recording = json['recording'];
@@ -91,8 +96,10 @@ class ArtistRecording {
           .toString(),
       mbid: recordingJson['mbid']?.toString(),
       relationType: json['rel_type']?.toString(),
-      position: _intOrNull(json['position']),
+      // 'position' pour les titres d'artiste, 'track_number' pour les titres d'album.
+      position: _intOrNull(json['position'] ?? json['track_number']),
       lengthMs: _intOrNull(recordingJson['length_ms']),
+      coverUrl: json['cover_url'] as String?,
     );
   }
 }
