@@ -4,7 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../favorites/presentation/favorites_providers.dart';
 import '../domain/artist_detail.dart';
+import 'album_tracks_screen.dart';
+import 'all_recordings_screen.dart';
 import 'artist_detail_view_model.dart';
+import 'track_tile.dart';
 
 class ArtistDetailScreen extends ConsumerWidget {
   const ArtistDetailScreen({required this.mbid, super.key});
@@ -105,7 +108,11 @@ class _DetailContent extends StatelessWidget {
                 const SizedBox(height: 28),
                 _AlbumsSection(albums: detail.albums),
                 const SizedBox(height: 28),
-                _RecordingsSection(recordings: detail.recordings),
+                _RecordingsSection(
+                  recordings: detail.recordings,
+                  mbid: artist.mbid,
+                  artistName: artist.name,
+                ),
                 const SizedBox(height: 28),
                 _CollaboratorsSection(collaborators: detail.collaborators),
               ],
@@ -311,14 +318,19 @@ class _AlbumCard extends StatelessWidget {
 
     return SizedBox(
       width: 150,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: SizedBox(
-              width: 150,
-              height: 150,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => AlbumTracksScreen(album: album)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: SizedBox(
+                width: 150,
+                height: 150,
               child: (album.coverUrl == null || album.coverUrl!.isEmpty)
                   ? placeholder
                   : CachedNetworkImage(
@@ -342,41 +354,56 @@ class _AlbumCard extends StatelessWidget {
               if (album.year != null) album.year!,
               if (album.totalTracks != null) '${album.totalTracks} titres',
             ].join(' · '),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        ],
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _RecordingsSection extends StatelessWidget {
-  const _RecordingsSection({required this.recordings});
+  const _RecordingsSection({
+    required this.recordings,
+    required this.mbid,
+    required this.artistName,
+  });
 
   final List<ArtistRecording> recordings;
+  final String mbid;
+  final String artistName;
 
   @override
   Widget build(BuildContext context) {
-    return _Section(
-      title: 'Recordings',
-      count: recordings.length,
-      emptyMessage: 'Aucun recording disponible.',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final recording in recordings.take(8))
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.music_note),
-            title: Text(recording.name),
-            subtitle: Text(
-              [
-                if (recording.relationType != null) recording.relationType!,
-                if (recording.lengthMs != null)
-                  _formatDuration(recording.lengthMs!),
-              ].join(' · '),
+        _SectionTitle(title: 'Titres', count: recordings.length),
+        const SizedBox(height: 8),
+        if (recordings.isEmpty)
+          Text('Aucun titre disponible.',
+              style: Theme.of(context).textTheme.bodyMedium)
+        else ...[
+          for (final recording in recordings.take(10))
+            TrackTile(recording: recording),
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      AllRecordingsScreen(mbid: mbid, artistName: artistName),
+                ),
+              ),
+              icon: const Icon(Icons.library_music),
+              label: const Text('Afficher tous les titres'),
             ),
           ),
+        ],
       ],
     );
   }
@@ -526,9 +553,3 @@ class _InfoItem {
   final String? value;
 }
 
-String _formatDuration(int lengthMs) {
-  final duration = Duration(milliseconds: lengthMs);
-  final minutes = duration.inMinutes;
-  final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-  return '$minutes:$seconds';
-}
