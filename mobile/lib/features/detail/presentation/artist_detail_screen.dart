@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../favorites/presentation/favorites_providers.dart';
 import '../domain/artist_detail.dart';
 import 'artist_detail_view_model.dart';
 
@@ -43,6 +44,22 @@ class _DetailContent extends StatelessWidget {
           pinned: true,
           expandedHeight: 320,
           title: Text(artist.name),
+          actions: [
+            Consumer(
+              builder: (context, ref, _) {
+                final isFav = ref.watch(isFavoriteProvider(artist.mbid));
+                return IconButton(
+                  icon: Icon(
+                    isFav ? Icons.favorite : Icons.favorite_border,
+                    color: isFav ? Colors.red : null,
+                  ),
+                  tooltip: isFav ? 'Retirer des favoris' : 'Ajouter aux favoris',
+                  onPressed: () =>
+                      ref.read(favoritesProvider.notifier).toggle(artist),
+                );
+              },
+            ),
+          ],
           flexibleSpace: FlexibleSpaceBar(
             background: _HeroImage(
               imageUrl: artist.imageUrl,

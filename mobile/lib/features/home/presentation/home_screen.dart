@@ -53,6 +53,12 @@ class HomeScreen extends StatelessWidget {
                     icon: const Icon(Icons.qr_code_scanner),
                     label: const Text('Scanner un QR code'),
                   ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: () => context.goNamed(AppRoutes.favoritesName),
+                    icon: const Icon(Icons.favorite),
+                    label: const Text('Mes favoris'),
+                  ),
                 ],
               ),
             ),
